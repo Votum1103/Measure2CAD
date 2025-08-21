@@ -1,0 +1,113 @@
+﻿<Window x:Class="Makro4._8.Window1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Makro4._8" Height="500" Width="850" Background="#FFF8F8F8">
+
+
+    <Grid Margin="10">
+        <TabControl>
+            <TabItem Header="Karta główna">
+                <Grid Background="#FFF0F0F0">
+                    <StackPanel Margin="10" VerticalAlignment="Top">
+
+                        <GroupBox Header="Połączenie z tachimetrem" Margin="0,0,0,10">
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <Label Content="Wybierz port:" Width="100" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="comboPorts" Width="150" Margin="5,0"/>
+                                <Button Content="Odśwież porty" Width="120" Margin="10,0" Click="RefreshPorts_Click"/>
+                                <Button Content="Start" Width="100" Margin="10,0" Click="Start_Click"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="Pomiary" Margin="0,0,0,10">
+                            <StackPanel Margin="5">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <Label Content="Liczba pomierzonych punktów:" FontSize="16" FontWeight="Bold"/>
+                                    <Label Content="0" FontSize="16" FontWeight="Bold" Margin="10,0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <Button Content="Rozpocznij pomiar" Height="30" Width="150" Margin="80,0,10,0" Click="Button_Click"/>
+                                    <Button Content="Pomierz punkt" Height="30" Width="150" Margin="0,0,10,0" Click="Button_Click"/>
+                                    <Button Content="Cofnij punkt" Height="30" Width="150" Margin="0,0,10,0" Click="Button_Click"/>
+                                    <Button Content="Przestaw tachimetr" Height="30" Width="150" Click="Button_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="Log komunikacji">
+                            <TextBox x:Name="logTextBox" Height="170" TextWrapping="Wrap"
+                                VerticalScrollBarVisibility="Auto" IsReadOnly="True"/>
+                        </GroupBox>
+
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Ustawienia">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid Background="#FFF0F0F0">
+                        <StackPanel Margin="10">
+
+                            <GroupBox Header="Parametry połączenia" Margin="0,0,0,10">
+                                <Grid Margin="5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <ColumnDefinition Width="200"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Label Content="Prędkość przesyłu:" Grid.Row="0" Grid.Column="0"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Width="150"/>
+
+                                    <Label Content="Bity danych:" Grid.Row="1" Grid.Column="0"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Width="150"/>
+
+                                    <Label Content="Bit stopu:" Grid.Row="2" Grid.Column="0"/>
+                                    <ComboBox Grid.Row="2" Grid.Column="1" Width="150"/>
+
+                                    <Label Content="Bit parzystości:" Grid.Row="3" Grid.Column="0"/>
+                                    <ComboBox Grid.Row="3" Grid.Column="1" Width="150"/>
+
+                                    <Label Content="Kontrola przepływu:" Grid.Row="4" Grid.Column="0"/>
+                                    <ComboBox Grid.Row="4" Grid.Column="1" Width="150"/>
+                                </Grid>
+                            </GroupBox>
+
+                            <GroupBox Header="Opcje przesyłanego tekstu">
+                                <StackPanel Margin="5">
+                                    <Label Content="Przesyłany tekst:"/>
+                                    <RadioButton Content="Append nothing"/>
+                                    <RadioButton Content="Append CR" Checked="RadioButton_Checked_1"/>
+                                    <RadioButton Content="Append LF" Checked="RadioButton_Checked_1"/>
+                                    <RadioButton Content="Append CR/LF" Checked="RadioButton_Checked_1"/>
+                                </StackPanel>
+                            </GroupBox>
+
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+
+
+            <TabItem Header="Komendy CAD">
+                <Grid Background="#FFF0F0F0">
+                    <UniformGrid Rows="2" Columns="3" Margin="10" HorizontalAlignment="Left">
+                        <Button Content="Linia" Width="80" Height="80" Margin="5" Click="InsertLine_Click"/>
+                        <Button Content="Punkt" Width="80" Height="80" Margin="5" Click="InsertPoint_Click"/>
+                        <Button Content="Łuk" Width="80" Height="80" Margin="5" Click="InsertArc_Click"/>
+                    </UniformGrid>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</Window>
