@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Makro4._8.Services;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using Makro4._8;
 
 namespace Makro4._8
 {
@@ -14,19 +14,6 @@ namespace Makro4._8
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var button = (Button)sender;
-            switch (button.Content?.ToString())
-            {
-                case "Rozpocznij pomiar":
-                    Methods.DrawLine();
-                    break;
-                case "Pomierz punkt":
-                    break;
-                case "Cofnij punkt":
-                    break;
-                case "Przestaw tachimetr":
-                    break;
-            }
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
