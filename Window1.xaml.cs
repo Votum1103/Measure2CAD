@@ -5,7 +5,6 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
-﻿using Makro4._8.Services;
 
 namespace Makro4._8
 {
