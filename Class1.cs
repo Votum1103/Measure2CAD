@@ -14,8 +14,6 @@ namespace Makro4._8
             var window = new Window1();
             var helper = new WindowInteropHelper(window);
 
-            // W GstarCAD odpowiednik Application.MainWindow zwykle istnieje;
-            // jeśli nie, użyj uchwytu bieżącego procesu (fallback).
             var owner = (Application.MainWindow != null)
                         ? Application.MainWindow.Handle
                         : System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
