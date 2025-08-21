@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using System;
 using System.IO.Ports;
 using System.Linq;
@@ -5,6 +6,12 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
+=======
+﻿using Makro4._8.Services;
+using System;
+using System.Windows;
+using System.Windows.Controls;
+>>>>>>> origin/master
 
 namespace Makro4._8
 {
@@ -47,6 +54,7 @@ namespace Makro4._8
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+<<<<<<< HEAD
             var button = (Button)sender;
             switch (button.Content?.ToString())
             {
@@ -66,6 +74,8 @@ namespace Makro4._8
                     SendLine("PRZESTAW");
                     break;
             }
+=======
+>>>>>>> origin/master
         }
 
         private void RadioButton_Checked_1(object sender, RoutedEventArgs e)
