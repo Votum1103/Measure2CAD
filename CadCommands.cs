@@ -9,6 +9,7 @@ namespace Makro4._8
     {
         private static readonly StateService _state = StateService.Instance;
         private static readonly CadDrawingService _draw = new CadDrawingService(_state);
+        private static Window1 _win;
 
         [CommandMethod("LL")]
         public void DrawLines() => _draw.DrawQueuedLinesAndLastPoint();
@@ -22,15 +23,16 @@ namespace Makro4._8
         [CommandMethod("OpenMyUi")]
         public void OpenMyUi()
         {
-            var window = new Window1();
-            var helper = new WindowInteropHelper(window);
-
-            var owner = (Application.MainWindow != null)
-                        ? Application.MainWindow.Handle
-                        : System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
-
-            helper.Owner = owner;
-            window.ShowDialog();
+            if (_win == null)
+            {
+                _win = new Window1();
+                _win.Closed += (s, e) => _win = null;
+                Application.ShowModelessWindow(_win);
+            }
+            else
+            {
+                _win.Activate();
+            }
         }
     }
 }
