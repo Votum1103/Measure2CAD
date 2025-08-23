@@ -45,6 +45,21 @@ namespace Makro4._8
                 TryClosePort();
         }
 
+        private void BtnStartMeasurement_Click(object sender, RoutedEventArgs e)
+        {
+            try { Gssoft.Gscad.Internal.Utils.SetFocusToDwgView(); } catch { }
+
+            var ok = MeasurementService.Instance.StartMeasurement();
+
+            var last = MeasurementService.Instance.LastPointWcs;
+            if (ok && last.HasValue)
+            {
+                var p = last.Value;
+
+                logTextBox.Text = $"X={p.X:0.###}; Y={p.Y:0.###}; Z={p.Z:0.###}";
+            }
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
         }
@@ -187,8 +202,6 @@ namespace Makro4._8
 
         private string GetTerminator()
         {
-            // Odczyt z radio buttonów w sekcji „Opcje przesyłanego tekstu”.
-            // Jeżeli nie masz x:Name dla RadioButton, możesz na szybko sprawdzić po Content:
             foreach (var rb in FindVisualChildren<RadioButton>(this))
             {
                 if (rb.IsChecked == true)
@@ -209,7 +222,6 @@ namespace Makro4._8
 
         private void SetStartButtonConnected(bool connected)
         {
-            // znajdź przycisk „Start” i zmień podpis
             var startBtn = FindDescendant<Button>(this, b => (b.Content as string) == "Start" || (b.Content as string) == "Stop");
             if (startBtn != null)
                 startBtn.Content = connected ? "Stop" : "Start";

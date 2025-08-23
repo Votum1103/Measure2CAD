@@ -29,7 +29,7 @@
                                     <Label Content="0" FontSize="16" FontWeight="Bold" Margin="10,0"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                    <Button Content="Rozpocznij pomiar" Height="30" Width="150" Margin="80,0,10,0" Click="Button_Click"/>
+                                    <Button Content="Rozpocznij pomiar" Height="30" Width="150" Margin="80,0,10,0" Click="BtnStartMeasurement_Click"/>
                                     <Button Content="Pomierz punkt" Height="30" Width="150" Margin="0,0,10,0" Click="Button_Click"/>
                                     <Button Content="Cofnij punkt" Height="30" Width="150" Margin="0,0,10,0" Click="Button_Click"/>
                                     <Button Content="Przestaw tachimetr" Height="30" Width="150" Click="Button_Click"/>
