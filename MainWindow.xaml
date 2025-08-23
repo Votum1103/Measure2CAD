@@ -66,19 +66,19 @@
                                     </Grid.ColumnDefinitions>
 
                                     <Label Content="Prędkość przesyłu:" Grid.Row="0" Grid.Column="0"/>
-                                    <TextBox Grid.Row="0" Grid.Column="1" Width="150"/>
+                                    <TextBox x:Name="txtBaud" Grid.Row="0" Grid.Column="1" Width="150" Text="9600"/>
 
                                     <Label Content="Bity danych:" Grid.Row="1" Grid.Column="0"/>
-                                    <TextBox Grid.Row="1" Grid.Column="1" Width="150"/>
+                                    <TextBox x:Name="txtDataBits" Grid.Row="1" Grid.Column="1" Width="150" Text="8"/>
 
                                     <Label Content="Bit stopu:" Grid.Row="2" Grid.Column="0"/>
-                                    <ComboBox Grid.Row="2" Grid.Column="1" Width="150"/>
+                                    <ComboBox x:Name="cmbStopBits" Grid.Row="2" Grid.Column="1" Width="150"/>
 
                                     <Label Content="Bit parzystości:" Grid.Row="3" Grid.Column="0"/>
-                                    <ComboBox Grid.Row="3" Grid.Column="1" Width="150"/>
+                                    <ComboBox x:Name="cmbParity" Grid.Row="3" Grid.Column="1" Width="150"/>
 
                                     <Label Content="Kontrola przepływu:" Grid.Row="4" Grid.Column="0"/>
-                                    <ComboBox Grid.Row="4" Grid.Column="1" Width="150"/>
+                                    <ComboBox x:Name="cmbHandshake" Grid.Row="4" Grid.Column="1" Width="150"/>
                                 </Grid>
                             </GroupBox>
 

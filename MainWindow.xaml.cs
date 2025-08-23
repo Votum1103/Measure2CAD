@@ -23,6 +23,17 @@ namespace Measure2cad
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             RefreshPorts();
+
+            cmbParity.ItemsSource = Enum.GetValues(typeof(Parity));
+            cmbStopBits.ItemsSource = new[] { StopBits.One, StopBits.OnePointFive, StopBits.Two };
+            cmbHandshake.ItemsSource = Enum.GetValues(typeof(Handshake));
+
+            if (cmbParity.SelectedItem == null) cmbParity.SelectedItem = Parity.None;
+            if (cmbStopBits.SelectedItem == null) cmbStopBits.SelectedItem = StopBits.One;
+            if (cmbHandshake.SelectedItem == null) cmbHandshake.SelectedItem = Handshake.None;
+
+            if (string.IsNullOrWhiteSpace(txtBaud.Text)) txtBaud.Text = "9600";
+            if (string.IsNullOrWhiteSpace(txtDataBits.Text)) txtDataBits.Text = "8";
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -56,8 +67,7 @@ namespace Measure2cad
             var last = MeasurementService.Instance.LastPointWcs;
             if (ok && last.HasValue)
             {
-                var p = last.Value; // Point3d
-                                    // zaktualizuj UI
+                var p = last.Value;
                 logTextBox.Text = $"Wstawiono tachimetr w punkcie: X={p.X:0.###}; Y={p.Y:0.###}; Z={p.Z:0.###}\n";
             }
         }
@@ -89,6 +99,19 @@ namespace Measure2cad
             }
         }
 
+        private static int ParseIntOrDefault(string text, int @default)
+    => int.TryParse(text, out var v) ? v : @default;
+
+        private static T ParseEnumFromCombo<T>(ComboBox combo, T @default) where T : struct, Enum
+        {
+            if (combo?.SelectedItem is T t) return t;
+
+            // jeśli Items są stringami/ComboBoxItem, spróbuj zparsować po tekście
+            var s = (combo?.SelectedItem as ComboBoxItem)?.Content as string
+                    ?? combo?.SelectedItem?.ToString();
+
+            return Enum.TryParse<T>(s, ignoreCase: true, out var val) ? val : @default;
+        }
         private void TryOpenSelectedPort()
         {
             if (comboPorts.SelectedItem == null)
@@ -99,24 +122,32 @@ namespace Measure2cad
 
             var portName = comboPorts.SelectedItem.ToString();
 
+            int baud = ParseIntOrDefault(txtBaud.Text, 9600);
+            int dataBits = ParseIntOrDefault(txtDataBits.Text, 8);
+            Parity parity = ParseEnumFromCombo(cmbParity, Parity.None);
+            StopBits stopBits = ParseEnumFromCombo(cmbStopBits, StopBits.One);
+            Handshake handshake = ParseEnumFromCombo(cmbHandshake, Handshake.None);
+
             try
             {
                 _serialPort = new SerialPort(
                     portName,
-                    9600,
-                    Parity.None,
-                    8,
-                    StopBits.One
+                    baud,
+                    parity,
+                    dataBits,
+                    stopBits
                 );
 
-                _serialPort.Handshake = Handshake.None;
-                _serialPort.NewLine = GetTerminator();
+                _serialPort.Handshake = handshake;
+
+                _serialPort.NewLine = GetTerminator() ?? string.Empty;
+
                 _serialPort.Encoding = Encoding.ASCII;
 
                 _serialPort.DataReceived += SerialPort_DataReceived;
                 _serialPort.Open();
 
-                Log("Połączono z " + portName);
+                Log($"Połączono z {portName} (baud={baud}, dataBits={dataBits}, parity={parity}, stopBits={stopBits}, handshake={handshake})");
                 SetStartButtonConnected(true);
             }
             catch (Exception ex)
@@ -125,6 +156,7 @@ namespace Measure2cad
                 TryClosePort();
             }
         }
+
 
         private void TryClosePort()
         {
