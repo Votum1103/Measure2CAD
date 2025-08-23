@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
 
-namespace Makro4._8
+namespace Measure2cad
 {
     public partial class Window1 : Window
     {
@@ -22,15 +23,12 @@ namespace Makro4._8
         private void Window1_Loaded(object sender, RoutedEventArgs e)
         {
             RefreshPorts();
-            // jeśli chcesz: wybierz ostatnio używany port itp.
         }
 
         private void Window1_Closed(object sender, EventArgs e)
         {
             TryClosePort();
         }
-
-        // === UI HANDLERS ===
 
         private void RefreshPorts_Click(object sender, RoutedEventArgs e)
         {
@@ -51,7 +49,6 @@ namespace Makro4._8
 
         private void RadioButton_Checked_1(object sender, RoutedEventArgs e)
         {
-            // jeśli kiedyś będziesz używać opcji CR/LF — odczytamy je w GetTerminator()
         }
 
         private void InsertLine_Click(object sender, RoutedEventArgs e) { }
@@ -59,7 +56,6 @@ namespace Makro4._8
         private void InsertArc_Click(object sender, RoutedEventArgs e) { }
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e) { }
 
-        // === SERIAL PORT ===
 
         private void RefreshPorts()
         {
@@ -90,17 +86,16 @@ namespace Makro4._8
 
             try
             {
-                // Parametry: ustaw pod swój tachimetr albo zbierz z zakładki „Ustawienia”
                 _serialPort = new SerialPort(
                     portName,
-                    9600,               // BaudRate
+                    9600,
                     Parity.None,
-                    8,                  // DataBits
+                    8,
                     StopBits.One
                 );
 
                 _serialPort.Handshake = Handshake.None;
-                _serialPort.NewLine = GetTerminator();   // CR/LF w zależności od radia w UI
+                _serialPort.NewLine = GetTerminator();
                 _serialPort.Encoding = Encoding.ASCII;
 
                 _serialPort.DataReceived += SerialPort_DataReceived;
@@ -146,49 +141,51 @@ namespace Makro4._8
         {
             try
             {
-                string data;
-                if (!string.IsNullOrEmpty(_serialPort.NewLine))
+                string line = !string.IsNullOrEmpty(_serialPort.NewLine)
+                              ? _serialPort.ReadLine()
+                              : _serialPort.ReadExisting();
+
+                if (TryParseGeoComMeasurement(line, out double hz, out double v, out double dist))
                 {
-                    data = _serialPort.ReadLine();
+                    Dispatcher.Invoke(() =>
+                    {
+                        Log($"WYNIK: Hz={hz:F6} rad, V={v:F6} rad, D={dist:F3} m");
+                    });
                 }
-                else
-                {
-                    data = _serialPort.ReadExisting();
-                }
-                Dispatcher.Invoke(() => Log("RX: " + data));
             }
             catch (Exception ex)
             {
                 Dispatcher.Invoke(() => Log("Błąd RX: " + ex.Message));
             }
         }
-
-        private void SendLine(string text)
+        private bool TryParseGeoComMeasurement(string line, out double hz, out double v, out double dist)
         {
-            try
-            {
-                if (_serialPort == null || !_serialPort.IsOpen)
-                {
-                    Log("Port nie jest otwarty.");
-                    return;
-                }
+            hz = 0; dist = 0; v = 0;
 
-                string suffix = GetTerminator();
-                string payload = suffix != null ? text + suffix : text;
+            if (string.IsNullOrWhiteSpace(line) || !line.StartsWith("%R1P,0,0:"))
+                return false;
 
-                _serialPort.Write(payload);
-                Log("TX: " + payload.Replace("\r", "\\r").Replace("\n", "\\n"));
-            }
-            catch (Exception ex)
-            {
-                Log("Błąd TX: " + ex.Message);
-            }
+            var payload = line.Substring("%R1P,0,0:".Length);
+
+            if (payload == "0")
+                return false;
+
+            var parts = payload.Split(',');
+            if (parts.Length < 4)
+                return false;
+
+            if (!double.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out hz))
+                return false;
+            if (!double.TryParse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture, out v))
+                return false;
+            if (!double.TryParse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture, out dist))
+                return false;
+
+            return true;
         }
 
         private string GetTerminator()
         {
-            // Odczyt z radio buttonów w sekcji „Opcje przesyłanego tekstu”.
-            // Jeżeli nie masz x:Name dla RadioButton, możesz na szybko sprawdzić po Content:
             foreach (var rb in FindVisualChildren<RadioButton>(this))
             {
                 if (rb.IsChecked == true)
@@ -202,14 +199,11 @@ namespace Makro4._8
                     }
                 }
             }
-            return "\r\n"; // domyślnie CRLF
+            return "\r\n";
         }
-
-        // === HELPERS ===
 
         private void SetStartButtonConnected(bool connected)
         {
-            // znajdź przycisk „Start” i zmień podpis
             var startBtn = FindDescendant<Button>(this, b => (b.Content as string) == "Start" || (b.Content as string) == "Stop");
             if (startBtn != null)
                 startBtn.Content = connected ? "Stop" : "Start";
@@ -221,7 +215,6 @@ namespace Makro4._8
             logTextBox.ScrollToEnd();
         }
 
-        // proste wyszukiwacze wizualne (bez dodatkowych bibliotek)
         private static T FindDescendant<T>(DependencyObject root, Func<T, bool> predicate) where T : DependencyObject
         {
             foreach (var d in FindVisualChildren<T>(root))
@@ -241,5 +234,50 @@ namespace Makro4._8
                     yield return c;
             }
         }
+        private void MeasurePoint_Click(object sender, RoutedEventArgs e)
+        {
+            if (_serialPort == null || !_serialPort.IsOpen)
+            {
+                Log("Błąd: brak aktywnego połączenia szeregowego!");
+                return;
+            }
+
+            try
+            {
+                _serialPort.DiscardInBuffer();
+
+                SendGeoCom("%R1Q,2008:1,1");
+                SendGeoCom("%R1Q,2108:2000,1");
+                SendGeoCom("%R1Q,11003:");
+                SendGeoCom("%R1Q,2008:0,0");
+
+                Log("Trwa pomiar punktu");
+            }
+            catch (Exception ex)
+            {
+                Log("Błąd TX: " + ex.Message);
+            }
+        }
+        private void SendGeoCom(string ascii)
+        {
+            try
+            {
+                if (_serialPort == null || !_serialPort.IsOpen)
+                {
+                    Log("Port nie jest otwarty.");
+                    return;
+                }
+
+                string suffix = GetTerminator();
+                string payload = suffix != null ? ascii + suffix : ascii;
+
+                _serialPort.Write(payload);
+            }
+            catch (Exception ex)
+            {
+                Log("Błąd TX: " + ex.Message);
+            }
+        }
     }
 }
+  

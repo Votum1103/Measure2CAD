@@ -2,7 +2,7 @@
 using Gssoft.Gscad.ApplicationServices;
 using Gssoft.Gscad.Geometry;
 
-namespace Makro4._8.Services
+namespace Measure2cad.Services
 {
     public class CadDrawingService
     {

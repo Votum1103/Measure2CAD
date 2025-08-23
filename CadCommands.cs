@@ -1,9 +1,9 @@
 ﻿using Gssoft.Gscad.Runtime;
 using Gssoft.Gscad.ApplicationServices;
 using System.Windows.Interop;
-using Makro4._8.Services;
+using Measure2cad.Services;
 
-namespace Makro4._8
+namespace Measure2cad
 {
     public class CadCommands
     {
@@ -11,16 +11,16 @@ namespace Makro4._8
         private static readonly CadDrawingService _draw = new CadDrawingService(_state);
         private static Window1 _win;
 
-        [CommandMethod("LL")]
+        [CommandMethod("ll")]
         public void DrawLines() => _draw.DrawQueuedLinesAndLastPoint();
 
-        [CommandMethod("PP")]
+        [CommandMethod("pp")]
         public void DrawAllPoints() => _draw.DrawAllPoints();
 
-        [CommandMethod("OO")]
+        [CommandMethod("oo")]
         public void AddControlPoints() => _draw.CommitControlPoints();
 
-        [CommandMethod("OpenMyUi")]
+        [CommandMethod("wnd")]
         public void OpenMyUi()
         {
             if (_win == null)

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Makro4._8.Services
+namespace Measure2cad.Services
 {
     public class StateService
     {
