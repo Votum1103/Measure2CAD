@@ -9,7 +9,7 @@ namespace Measure2cad
     {
         private static readonly StateService _state = StateService.Instance;
         private static readonly CadDrawingService _draw = new CadDrawingService(_state);
-        private static Window1 _win;
+        private static MainWindow _win;
 
         [CommandMethod("ll")]
         public void DrawLines() => _draw.DrawQueuedLinesAndLastPoint();
@@ -25,7 +25,7 @@ namespace Measure2cad
         {
             if (_win == null)
             {
-                _win = new Window1();
+                _win = new MainWindow();
                 _win.Closed += (s, e) => _win = null;
                 Application.ShowModelessWindow(_win);
             }

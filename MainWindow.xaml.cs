@@ -9,23 +9,23 @@ using System.Windows.Markup;
 
 namespace Measure2cad
 {
-    public partial class Window1 : Window
+    public partial class MainWindow : Window
     {
         private SerialPort _serialPort;
 
-        public Window1()
+        public MainWindow()
         {
             InitializeComponent();
-            Loaded += Window1_Loaded;
-            Closed += Window1_Closed;
+            Loaded += MainWindow_Loaded;
+            Closed += MainWindow_Closed;
         }
 
-        private void Window1_Loaded(object sender, RoutedEventArgs e)
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             RefreshPorts();
         }
 
-        private void Window1_Closed(object sender, EventArgs e)
+        private void MainWindow_Closed(object sender, EventArgs e)
         {
             TryClosePort();
         }

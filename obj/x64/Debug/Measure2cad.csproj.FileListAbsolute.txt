@@ -3,8 +3,6 @@ C:\Users\Julia\source\repos\Makro\bin\x64\Debug\GcDbMgd.dll
 C:\Users\Julia\source\repos\Makro\bin\x64\Debug\GcMgd.dll
 C:\Users\Julia\source\repos\Makro\bin\x64\Debug\MFCMIFC80.dll
 C:\Users\Julia\source\repos\Makro\obj\x64\Debug\Measure2cad.csproj.AssemblyReference.cache
-C:\Users\Julia\source\repos\Makro\obj\x64\Debug\Window1.baml
-C:\Users\Julia\source\repos\Makro\obj\x64\Debug\Window1.g.cs
 C:\Users\Julia\source\repos\Makro\obj\x64\Debug\Measure2cad.csproj.GenerateResource.cache
 C:\Users\Julia\source\repos\Makro\obj\x64\Debug\Measure2cad.csproj.CoreCompileInputs.cache
 C:\Users\Julia\source\repos\Makro\obj\x64\Debug\Measure2.6FFBA058.Up2Date
@@ -15,3 +13,5 @@ C:\Users\Julia\source\repos\Makro\obj\x64\Debug\Measure2cad.g.resources
 C:\Users\Julia\source\repos\Makro\obj\x64\Debug\Measure2cad.Properties.Resources.resources
 C:\Users\Julia\source\repos\Makro\obj\x64\Debug\Measure2cad.dll
 C:\Users\Julia\source\repos\Makro\obj\x64\Debug\Measure2cad.pdb
+C:\Users\Julia\source\repos\Makro\obj\x64\Debug\MainWindow.baml
+C:\Users\Julia\source\repos\Makro\obj\x64\Debug\MainWindow.g.cs
