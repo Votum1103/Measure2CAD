@@ -3,3 +3,6 @@
 *.suo
 *.userosscache
 *.sln.docstates
+bin/
+obj/
+*.cache
