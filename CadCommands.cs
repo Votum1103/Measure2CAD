@@ -34,5 +34,11 @@ namespace Measure2cad
                 _win.Activate();
             }
         }
+        [CommandMethod("startm")]
+        public void StartMeasurementCommand()
+        {
+            MeasurementService.Instance.StartMeasurement();
+        }    
     }
+
 }

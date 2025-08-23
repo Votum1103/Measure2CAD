@@ -47,6 +47,21 @@ namespace Measure2cad
         {
         }
 
+        private void BtnStartMeasurement_Click(object sender, RoutedEventArgs e)
+        {
+            try { Gssoft.Gscad.Internal.Utils.SetFocusToDwgView(); } catch { }
+
+            var ok = MeasurementService.Instance.StartMeasurement();
+
+            var last = MeasurementService.Instance.LastPointWcs;
+            if (ok && last.HasValue)
+            {
+                var p = last.Value; // Point3d
+                                    // zaktualizuj UI
+                logTextBox.Text = $"Wstawiono tachimetr w punkcie: X={p.X:0.###}; Y={p.Y:0.###}; Z={p.Z:0.###}\n";
+            }
+        }
+
         private void RadioButton_Checked_1(object sender, RoutedEventArgs e)
         {
         }

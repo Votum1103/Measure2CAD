@@ -3,20 +3,17 @@ using Gssoft.Gscad.DatabaseServices;
 using Gssoft.Gscad.EditorInput;
 using Gssoft.Gscad.Geometry;
 using Gssoft.Gscad.Runtime;
-using Makro4._8;
 using System;
 using System.Collections.Generic;
 
 public sealed class MeasurementService
 {
-    // Singleton
     private static readonly Lazy<MeasurementService> _lazy =
         new Lazy<MeasurementService>(() => new MeasurementService());
     public static MeasurementService Instance => _lazy.Value;
 
     private MeasurementService() { }
 
-    // Globalny stan dostępny dla innych klas
     public Point3d? LastPointWcs { get; private set; }
     public ObjectId? LastEntityId { get; private set; }
     public readonly List<Point3d> AllPointsWcs = new List<Point3d>();
@@ -52,15 +49,9 @@ public sealed class MeasurementService
             var bt = (BlockTable)tr.GetObject(doc.Database.BlockTableId, OpenMode.ForRead);
             var btr = (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
 
-            // DBPoint – placeholder; w przyszłości tu podmienisz na BlockReference
             var dbp = new DBPoint(pickedWcs);
             var entId = btr.AppendEntity(dbp);
             tr.AddNewlyCreatedDBObject(dbp, true);
-
-            // (opcjonalnie) ustaw warstwę/wygląd punkta:
-            // dbp.SetDatabaseDefaults();
-            // dbp.Layer = "Pomiar"; // zadbaj, by istniała
-
             tr.Commit();
 
             LastPointWcs = pickedWcs;
