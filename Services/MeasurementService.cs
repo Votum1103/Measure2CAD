@@ -5,6 +5,8 @@ using Gssoft.Gscad.Geometry;
 using Gssoft.Gscad.Runtime;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 public sealed class MeasurementService
 {
@@ -31,17 +33,27 @@ public sealed class MeasurementService
 
         var ed = doc.Editor;
 
-        var ppo = new PromptPointOptions("\nWskaż punkt pomiaru:")
-        {
-            AllowNone = false
-        };
+        var ppo = new PromptPointOptions("\nWskaż punkt pomiaru:") { AllowNone = false };
         var ppr = ed.GetPoint(ppo);
-        if (ppr.Status != PromptStatus.OK)
-            return false;
+        if (ppr.Status != PromptStatus.OK) return false;
 
         var ucs = ed.CurrentUserCoordinateSystem;
         var pickedUcs = ppr.Value;
         var pickedWcs = pickedUcs.TransformBy(ucs);
+
+        var dwgPath = ResolvePluginPath("../../../DWGBlocks/TotalStation.dwg");
+        var blockName = "Total";
+
+        ObjectId blockDefId;
+        try
+        {
+            blockDefId = ImportBlock(doc.Database, dwgPath, blockName);
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage($"\nNie udało się wczytać bloku '{blockName}' z '{dwgPath}': {ex.Message}");
+            return false;
+        }
 
         using (doc.LockDocument())
         using (var tr = doc.Database.TransactionManager.StartTransaction())
@@ -49,22 +61,81 @@ public sealed class MeasurementService
             var bt = (BlockTable)tr.GetObject(doc.Database.BlockTableId, OpenMode.ForRead);
             var btr = (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
 
-            var dbp = new DBPoint(pickedWcs);
-            var entId = btr.AppendEntity(dbp);
-            tr.AddNewlyCreatedDBObject(dbp, true);
+            var br = new BlockReference(pickedWcs, blockDefId);
+
+            br.ScaleFactors = new Scale3d(1.0);
+
+            if (br.ScaleFactors.X < 0.2 || br.ScaleFactors.Y < 0.2 || br.ScaleFactors.Z < 0.2)
+            {
+                br.ScaleFactors = new Scale3d(0.02);
+            }
+
+            var entId = btr.AppendEntity(br);
+            tr.AddNewlyCreatedDBObject(br, true);
+
             tr.Commit();
 
             LastPointWcs = pickedWcs;
             LastEntityId = entId;
             AllPointsWcs.Add(pickedWcs);
         }
+        //#TODO: Do zmiany jest path dla bloku bo na razie prowizorka a do tego trzeba zmienić block w dwg bo jest mały i ws tawia sie w milimetrach a powienien pewniew  w centymetrach 
 
         MeasurementAdded?.Invoke(this, pickedWcs);
-
-        ed.WriteMessage($"\nZapisano punkt (WCS): {Format3d(pickedWcs)}");
+        ed.WriteMessage($"\nWstawiono blok '{blockName}' w {Format3d(pickedWcs)}");
 
         return true;
     }
 
     private static string Format3d(Point3d p) => $"Tachimetr został ustawiony na X={p.X:0.###}, Y={p.Y:0.###}, Z={p.Z:0.###}";
+
+
+    private static ObjectId ImportBlock(Database destDb, string dwgPath, string blockName)
+    {
+        using (var sourceDb = new Database(false, true))
+        {
+            sourceDb.ReadDwgFile(dwgPath, FileOpenMode.OpenForReadAndAllShare, true, "");
+
+            var idMap = new IdMapping();
+            var ids = new ObjectIdCollection();
+
+            using (var tr = sourceDb.TransactionManager.StartTransaction())
+            {
+                var bt = (BlockTable)tr.GetObject(sourceDb.BlockTableId, OpenMode.ForRead);
+                if (!bt.Has(blockName))
+                    throw new System.Exception($"Block '{blockName}' not found in {dwgPath}");
+
+                ids.Add(bt[blockName]);
+            }
+
+            destDb.WblockCloneObjects(
+                ids,
+                destDb.BlockTableId,
+                idMap,
+                DuplicateRecordCloning.Ignore,
+                false
+            );
+        }
+
+        using (var tr = destDb.TransactionManager.StartTransaction())
+        {
+            var bt = (BlockTable)tr.GetObject(destDb.BlockTableId, OpenMode.ForRead);
+            return bt[blockName];
+        }
+    }
+
+    static string PluginDir()
+    {
+        var asmPath = Assembly.GetExecutingAssembly().Location;
+        return Path.GetDirectoryName(asmPath);
+    }
+
+
+    static string ResolvePluginPath(string tildePath)
+    {
+        var rel = tildePath.TrimStart('~', '/', '\\');
+        var full = Path.Combine(PluginDir(), rel);
+        return Path.GetFullPath(full);
+    }
+
 }
