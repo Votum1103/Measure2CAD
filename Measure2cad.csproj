@@ -84,9 +84,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Services\CadDrawingService.cs" />
-    <Compile Include="Services\MeasurementService.cs" />
-    <Compile Include="Services\StateService.cs" />
+    <Compile Include="Services\CadService.cs" />
+    <Compile Include="Services\SurveyService.cs" />
+    <Compile Include="Services\SurveyState.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>

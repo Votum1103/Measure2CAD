@@ -7,18 +7,18 @@ namespace Measure2cad
 {
     public class CadCommands
     {
-        private static readonly StateService _state = StateService.Instance;
-        private static readonly CadDrawingService _draw = new CadDrawingService(_state);
+        private static readonly SurveyState _state = SurveyState.Instance;
+        private static readonly CadService _draw = new CadService();
         private static MainWindow _win;
 
-        [CommandMethod("ll")]
-        public void DrawLines() => _draw.DrawQueuedLinesAndLastPoint();
+        [CommandMethod("PP")]
+        public void DrawAllMeasuredPoints() => SurveyService.Instance.DrawAllPoints();
 
-        [CommandMethod("pp")]
-        public void DrawAllPoints() => _draw.DrawAllPoints();
+        [CommandMethod("LL")]
+        public void DrawQueuedLines() => SurveyService.Instance.DrawQueuedLines();
 
-        [CommandMethod("oo")]
-        public void AddControlPoints() => _draw.CommitControlPoints();
+        [CommandMethod("ST")]
+        public void StartStation() => SurveyService.Instance.StartStationSetup();
 
         [CommandMethod("wnd")]
         public void OpenMyUi()
@@ -34,11 +34,6 @@ namespace Measure2cad
                 _win.Activate();
             }
         }
-        [CommandMethod("startm")]
-        public void StartMeasurementCommand()
-        {
-            MeasurementService.Instance.StartMeasurement();
-        }    
     }
 
 }

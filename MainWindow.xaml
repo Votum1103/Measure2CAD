@@ -26,7 +26,7 @@
                             <StackPanel Margin="5">
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                     <Label Content="Liczba pomierzonych punktów:" FontSize="16" FontWeight="Bold"/>
-                                    <Label Content="0" FontSize="16" FontWeight="Bold" Margin="10,0"/>
+                                    <Label x:Name="lblMeasuredCount" Content="0" FontSize="16" FontWeight="Bold" Margin="10,0"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                     <Button Content="Rozpocznij pomiar" Height="30" Width="150" Margin="80,0,10,0" Click="BtnStartMeasurement_Click"/>

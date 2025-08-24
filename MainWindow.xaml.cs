@@ -1,3 +1,4 @@
+using Measure2cad.Services;
 using System;
 using System.Globalization;
 using System.IO.Ports;
@@ -62,12 +63,10 @@ namespace Measure2cad
         {
             try { Gssoft.Gscad.Internal.Utils.SetFocusToDwgView(); } catch { }
 
-            var ok = MeasurementService.Instance.StartMeasurement();
-
-            var last = MeasurementService.Instance.LastPointWcs;
-            if (ok && last.HasValue)
+            var ok = SurveyService.Instance.StartStationSetup();
+            if (ok)
             {
-                var p = last.Value;
+                var p = SurveyState.Instance.StationWcs;
                 logTextBox.Text = $"Wstawiono tachimetr w punkcie: X={p.X:0.###}; Y={p.Y:0.###}; Z={p.Z:0.###}\n";
             }
         }
@@ -194,17 +193,23 @@ namespace Measure2cad
 
                 if (TryParseGeoComMeasurement(line, out double hz, out double v, out double dist))
                 {
-                    Dispatcher.Invoke(() =>
+                    var wcs = SurveyService.Instance.AddMeasuredObservation(hzRad: hz, vRad: v, slopeDist: dist);
+
+                    Dispatcher.Invoke(new Action(() =>
                     {
-                        Log($"WYNIK: Hz={hz:F6} rad, V={v:F6} rad, D={dist:F3} m");
-                    });
+                        lblMeasuredCount.Content = SurveyState.Instance.MeasuredPointsWcs.Count.ToString();
+
+                        Log($"WYNIK: Hz={hz:F6} rad, V={v:F6} rad, D={dist:F3} m  ->  P=({wcs.X:F3}, {wcs.Y:F3}, {wcs.Z:F3})");
+                    }));
                 }
             }
             catch (Exception ex)
             {
-                Dispatcher.Invoke(() => Log("Błąd RX: " + ex.Message));
+                Dispatcher.Invoke(new Action(() => Log("Błąd RX: " + ex.Message)));
             }
         }
+
+
         private bool TryParseGeoComMeasurement(string line, out double hz, out double v, out double dist)
         {
             hz = 0; dist = 0; v = 0;
@@ -327,4 +332,3 @@ namespace Measure2cad
         }
     }
 }
-  
