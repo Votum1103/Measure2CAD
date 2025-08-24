@@ -22,10 +22,6 @@ public sealed class MeasurementService
 
     public event EventHandler<Point3d> MeasurementAdded;
 
-    /// <summary>
-    /// Rozpoczyna interakcję z użytkownikiem: wskazanie punktu i wstawienie DBPoint (na razie).
-    /// Zwraca true, jeśli pomiar wykonano (nie anulowano).
-    /// </summary>
     public bool StartMeasurement()
     {
         var doc = Application.DocumentManager.MdiActiveDocument;
@@ -41,7 +37,7 @@ public sealed class MeasurementService
         var pickedUcs = ppr.Value;
         var pickedWcs = pickedUcs.TransformBy(ucs);
 
-        var dwgPath = ResolvePluginPath("../../../DWGBlocks/TotalStation.dwg");
+        var dwgPath = ResolvePluginPath("./DWGBlocks/TotalStation.dwg");
         var blockName = "Total";
 
         ObjectId blockDefId;
@@ -79,7 +75,6 @@ public sealed class MeasurementService
             LastEntityId = entId;
             AllPointsWcs.Add(pickedWcs);
         }
-        //#TODO: Do zmiany jest path dla bloku bo na razie prowizorka a do tego trzeba zmienić block w dwg bo jest mały i ws tawia sie w milimetrach a powienien pewniew  w centymetrach 
 
         MeasurementAdded?.Invoke(this, pickedWcs);
         ed.WriteMessage($"\nWstawiono blok '{blockName}' w {Format3d(pickedWcs)}");
