@@ -13,12 +13,16 @@ namespace Measure2cad
     public partial class MainWindow : Window
     {
         private SerialPort _serialPort;
+        private bool _isLaserOn = true;
 
         public MainWindow()
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
             Closed += MainWindow_Closed;
+
+            SurveyService.Instance.MeasuredCountChanged += (s, count) =>
+            Dispatcher.Invoke(() => lblMeasuredCount.Content = count.ToString());
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -105,7 +109,6 @@ namespace Measure2cad
         {
             if (combo?.SelectedItem is T t) return t;
 
-            // jeśli Items są stringami/ComboBoxItem, spróbuj zparsować po tekście
             var s = (combo?.SelectedItem as ComboBoxItem)?.Content as string
                     ?? combo?.SelectedItem?.ToString();
 
@@ -148,6 +151,7 @@ namespace Measure2cad
 
                 Log($"Połączono z {portName} (baud={baud}, dataBits={dataBits}, parity={parity}, stopBits={stopBits}, handshake={handshake})");
                 SetStartButtonConnected(true);
+                SendGeoCom("%R1Q,1004:1");
             }
             catch (Exception ex)
             {
@@ -197,8 +201,6 @@ namespace Measure2cad
 
                     Dispatcher.Invoke(new Action(() =>
                     {
-                        lblMeasuredCount.Content = SurveyState.Instance.MeasuredPointsWcs.Count.ToString();
-
                         Log($"WYNIK: Hz={hz:F6} rad, V={v:F6} rad, D={dist:F3} m  ->  P=({wcs.X:F3}, {wcs.Y:F3}, {wcs.Z:F3})");
                     }));
                 }
@@ -286,6 +288,27 @@ namespace Measure2cad
                     yield return c;
             }
         }
+
+        private void SwitchLaser_Click(object sender, RoutedEventArgs e)
+        { 
+            if (_serialPort == null || !_serialPort.IsOpen)
+            {
+                Log("Błąd: brak aktywnego połączenia szeregowego!");
+                return;
+            }
+            try
+            {
+                _serialPort.DiscardInBuffer();
+                int arg = _isLaserOn ? 0 : 1;
+                SendGeoCom($"%R1Q,1004:{arg}");
+                _isLaserOn = !_isLaserOn;
+            }
+            catch (Exception ex)
+            {
+                Log("Błąd TX: " + ex.Message);
+            }
+        }
+
         private void MeasurePoint_Click(object sender, RoutedEventArgs e)
         {
             if (_serialPort == null || !_serialPort.IsOpen)

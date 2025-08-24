@@ -9,18 +9,10 @@ namespace Measure2cad.Services
         public static SurveyState Instance { get; } = new SurveyState();
 
         private SurveyState() { }
-
-        public int PendingPointsCount { get; set; } = 0;
-
         public Point3d StationWcs { get; set; } = new Point3d(0, 0, 0);
         public double StationRotationDeg { get; set; } = 0.0;
-
         public List<Point3d> MeasuredPointsWcs { get; } = new List<Point3d>();
-
-        public List<(Point3d a, Point3d b)> PendingLinesWcs { get; } = new List<(Point3d a, Point3d b)>();
-
-        public List<(Point3d pt, int nr)> ControlPoints { get; } = new List<(Point3d pt, int nr)>();
-
+        public List<Point3d> ControlPoints { get; } = new List<Point3d>();
         public Point3d ComputePointWcs(double hzRad, double vRad, double slopeDist)
         {
             double hDist = slopeDist * Math.Sin(vRad);

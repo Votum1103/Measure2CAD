@@ -17,7 +17,7 @@ public sealed class SurveyService
     public double TachyBlockScale { get; set; } = 1.0;
 
     public event EventHandler<Point3d> StationSet;
-    public event EventHandler<Point3d> PointAdded;
+    public event EventHandler<int> MeasuredCountChanged;
 
     private SurveyService() { }
 
@@ -37,7 +37,7 @@ public sealed class SurveyService
 
         try
         {
-            _cad.InsertBlock(doc.Database, TachyDwgPath, TachyBlockName, pickedWcs, TachyBlockScale < 0.2 ? 0.02 : TachyBlockScale);
+            _cad.InsertBlock(doc.Database, TachyDwgPath, TachyBlockName, pickedWcs, TachyBlockScale);
         }
         catch (Exception ex)
         {
@@ -52,40 +52,59 @@ public sealed class SurveyService
         return true;
     }
 
+    private void RaiseMeasuredCountChanged()
+    => MeasuredCountChanged?.Invoke(this, _state.MeasuredPointsWcs.Count);
+
     public Point3d AddMeasuredObservation(double hzRad, double vRad, double slopeDist)
     {
         var wcs = _state.ComputePointWcs(hzRad, vRad, slopeDist);
         _state.MeasuredPointsWcs.Add(wcs);
 
-        PointAdded?.Invoke(this, wcs);
+        RaiseMeasuredCountChanged();
         return wcs;
     }
 
     public void DrawAllPoints(short colorIndex = 2)
     {
-        int n = _state.PendingPointsCount;
-        if (n <= 0) return;
+        var pts = _state.MeasuredPointsWcs;
+        if (pts.Count <= 0) return;
 
-        _cad.SetPointStyle(0.02);
         foreach (var p in _state.MeasuredPointsWcs)
             _cad.DrawPoint(p, colorIndex);
 
-        _state.PendingPointsCount = 0;
+        pts.Clear();
+        RaiseMeasuredCountChanged();
     }
 
-    public void   DrawQueuedLines(short colorIndex = 3)
+    public void DrawQueuedLines(short lineColorIndex = 3, short oddPointColorIndex = 2)
     {
-        foreach (var ln in _state.PendingLinesWcs)
-            _cad.DrawLine(ln.a, ln.b, colorIndex);
+        var pts = _state.MeasuredPointsWcs;
+        int n = pts.Count;
+        if (n == 0) return;
+
+        _cad.SetPointStyle(0.02);
+
+        for (int i = 0; i + 1 < n; i += 2)
+        {
+            _cad.DrawLine(pts[i], pts[i + 1], lineColorIndex);
+        }
+
+        if ((n & 1) == 1)
+        {
+            _cad.DrawPoint(pts[n - 1], oddPointColorIndex);
+        }
+
+        pts.Clear();
+        RaiseMeasuredCountChanged();
     }
 
-    public void AddControlPoint(Point3d pt, int nr, bool drawNow = false)
+
+    public void AddControlPoint(Point3d pt, bool drawNow = false)
     {
-        _state.ControlPoints.Add((pt, nr));
+        _state.ControlPoints.Add((pt));
         if (drawNow)
         {
             _cad.DrawPoint(pt, colorIndex: 1);
-            _cad.DrawText(pt, $"#{nr}", 0.05, colorIndex: 1);
         }
     }
 

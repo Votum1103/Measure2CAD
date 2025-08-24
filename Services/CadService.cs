@@ -46,22 +46,6 @@ namespace Measure2cad.Services
             }
         }
 
-        public ObjectId DrawText(Point3d at, string text, double height = 0.05, short colorIndex = 7)
-        {
-            var doc = Application.DocumentManager.MdiActiveDocument;
-            using (doc.LockDocument())
-            using (var tr = doc.Database.TransactionManager.StartTransaction())
-            {
-                var bt = (BlockTable)tr.GetObject(doc.Database.BlockTableId, OpenMode.ForRead);
-                var ms = (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
-
-                var mt = new MText { Location = at, Contents = text, TextHeight = height, ColorIndex = colorIndex };
-                var id = ms.AppendEntity(mt); tr.AddNewlyCreatedDBObject(mt, true);
-                tr.Commit();
-                return id;
-            }
-        }
-
         public ObjectId InsertBlock(Database db, string dwgPath, string blockName, Point3d position, double scale = 1.0)
         {
             if (!File.Exists(dwgPath))

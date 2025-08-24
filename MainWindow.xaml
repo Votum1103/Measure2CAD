@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Measure2cad" Height="500" Width="850" Background="#FFF8F8F8">
+        Title="Measure2cad" Height="600" Width="850" Background="#FFF8F8F8">
 
 
     <Grid Margin="10">
@@ -41,7 +41,9 @@
                             <TextBox x:Name="logTextBox" Height="170" TextWrapping="Wrap"
                                 VerticalScrollBarVisibility="Auto" IsReadOnly="True"/>
                         </GroupBox>
-
+                        <GroupBox Header="Przyciski pomocnicze" Height="50" Width="800">
+                            <Button Content="Plamka lasera" Height="20" Width="100" Click="SwitchLaser_Click" Margin="679,0,9,0"/>
+                        </GroupBox>
                     </StackPanel>
                 </Grid>
             </TabItem>
