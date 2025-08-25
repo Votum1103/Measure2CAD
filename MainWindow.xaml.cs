@@ -211,7 +211,6 @@ namespace Measure2cad
             }
         }
 
-
         private bool TryParseGeoComMeasurement(string line, out double hz, out double v, out double dist)
         {
             hz = 0; dist = 0; v = 0;
